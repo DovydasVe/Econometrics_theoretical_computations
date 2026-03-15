@@ -1,0 +1,138 @@
+---
+title:  "Assignment 2"
+author: ""
+date:   "14/03/2026"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(comment = NA)    # no ## as start of output
+
+rm(list = ls());  cat("\014")          # start with a clean sheet
+```
+
+## Part 1
+
+You might develop part 1 and part 2 separately, but in the end it should be combined and kitted into one pdf.
+Be aware that this will only succeed if ALL chunks are error-free.
+
+***
+
+The chunk below can be used for reading the data file and setting up the variables needed for estimating the model. You might even include some basic statistics and (scatter)plots.
+
+```{r echo=FALSE}
+
+for (i in 1:5) cat(sprintf(".\n"))
+   
+
+
+
+```
+
+
+RMarkdown sections can be used, either to comment on the {r} chunk above, 
+
+---
+
+or to introduce the next {r} chunk.
+ 
+                                        
+```{r echo=TRUE}
+#
+#
+# For parts of the code that you want in the knitted file.
+#
+#
+
+
+```
+\newpage
+
+## Part 2
+
+In the chunk below, a matrix is constructed containing a column with ones and two regressors taken from the given data files.
+                                        
+```{r echo=FALSE }
+path = "C:/Users/...."
+
+file = "..."
+sprintf("We are using Dataset %s", file)
+data   = read.csv(file)
+
+#  extract the variables educ and exp
+
+n    = length(educ)
+Xdgp = cbind( rep(1,n), educ, exp, X4)        # regressors of the true model
+beta0 = c(1, 0.1, 0.025, b4)                  # parameters of the true model
+sigm0 = 1
+
+```
+\newpage 
+## Exercise 2.1
+### One sample of $n = 500$
+
+```{r echo=TRUE }
+set.seed(100) 
+eps      = rnorm(n, 0, sigm0)                       # generate disturbances N(0, sigma^2)
+ysim     = Xdgp %*% beta0 + eps                     # together with X, your data set is complete
+
+#
+#  Code for exercise 2.1
+#
+
+X = cbind( rep(1,n), , , ,  )          # setup the model you want to estimate
+k = ncol(X)
+
+XtX   = t(X) %*% X                     # matrix with basic statistics (n, sum(x), sum(x^2))
+XXinv = solve(XtX)                     # matrix used in Variance of estimator b
+diagXXinv = diag(XXinv)                # the diagonal elements (for the variance of b)
+XXinvX    = XXinv %*% t(X)             # part of the estimator betahat that remains the same
+
+
+
+
+
+```
+
+
+```{r echo=TRUE }
+#
+#  More code for exercise 2.1 (RESET test)
+#
+
+
+
+
+
+```
+
+
+
+```{r echo=TRUE }
+#
+#  Code for exercise 2.2
+#
+
+
+
+for (i in 1:nsim) {
+
+
+
+
+
+#
+#  More code for exercise 2.2
+#
+
+
+
+
+
+
+}
+```
+
+
+For the next questions, copy/paste the code from the previous exercise and make the required adjustments.
