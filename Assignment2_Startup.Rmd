@@ -1,7 +1,7 @@
 ---
 title:  "Assignment 2"
-author: ""
-date:   "14/03/2026"
+authors: "Dovydas Venclovas, Ignas Jasinskis, Radin Azadmanesh, Denis Goncharov"
+date:   "20/03/2026"
 output: pdf_document
 ---
 
@@ -14,38 +14,45 @@ rm(list = ls());  cat("\014")          # start with a clean sheet
 
 ## Part 1
 
-You might develop part 1 and part 2 separately, but in the end it should be combined and kitted into one pdf.
-Be aware that this will only succeed if ALL chunks are error-free.
+## Exercise 1.1
 
-***
-
-The chunk below can be used for reading the data file and setting up the variables needed for estimating the model. You might even include some basic statistics and (scatter)plots.
-
+We start by estimating the model.
 ```{r echo=FALSE}
+file = "bankwage_data.csv"
+data   = read.csv(file)
 
-for (i in 1:5) cat(sprintf(".\n"))
-   
+y = data$lwage
+n = nrow(data)
+K = 3
+X = cbind(rep(1,n), data$educ, data$exp)
 
+bhat = solve(t(X) %*% X) %*% t(X) %*% y
 
-
+bhat_vec = setNames(as.vector(bhat), c("Intercept", "Education", "Experience"))
+round(bhat_vec, 3)
 ```
+As the estimated OLS coefficients are small, we can conclude that one unit 
+change in a regressor $x_{k,i}$ translates to $\beta_k \times 100\%$ change in $y_i$.
+In other words, each additional unit of education increases wages by 11.8%,
+whereas each additional unit of experience increases wages only by 2.2%.
 
+## Exercise 1.2
 
-RMarkdown sections can be used, either to comment on the {r} chunk above, 
+The correlation coefficient can be measured as
+$$r_{\hat{\beta}_2,\hat{\beta}_3} = \frac{Cov(\hat{\beta}_2,\hat{\beta}_3)} {\sqrt{Var(\hat{\beta}_2)Var(\hat{\beta}_3)}}.$$
+Computing the expression in R yields the following result.
+```{r echo=FALSE}
+e = y - (y - X %*% bhat)
+ssr = sum(e*e)
+sample_var = ssr/(n-K)
+var_cov = sample_var * solve(t(X) %*% X)
 
----
+cov_b2b3 = var_cov[3,2]
+var_b2 = var_cov[2,2]
+var_b3 = var_cov[3,3]
 
-or to introduce the next {r} chunk.
- 
-                                        
-```{r echo=TRUE}
-#
-#
-# For parts of the code that you want in the knitted file.
-#
-#
-
-
+corr_b2b3 = cov_b2b3 / sqrt(var_b2 * var_b3)
+round(corr_b2b3, 4)
 ```
 \newpage
 
@@ -54,18 +61,16 @@ or to introduce the next {r} chunk.
 In the chunk below, a matrix is constructed containing a column with ones and two regressors taken from the given data files.
                                         
 ```{r echo=FALSE }
-path = "C:/Users/...."
-
-file = "..."
-sprintf("We are using Dataset %s", file)
-data   = read.csv(file)
+# file = "bankwage_data.csv"
+# sprintf("We are using Dataset %s", file)
+# data   = read.csv(file)
 
 #  extract the variables educ and exp
 
-n    = length(educ)
-Xdgp = cbind( rep(1,n), educ, exp, X4)        # regressors of the true model
-beta0 = c(1, 0.1, 0.025, b4)                  # parameters of the true model
-sigm0 = 1
+#n    = length(educ)
+#Xdgp = cbind( rep(1,n), educ, exp, X4)        # regressors of the true model
+#beta0 = c(1, 0.1, 0.025, b4)                  # parameters of the true model
+#sigm0 = 1
 
 ```
 \newpage 
@@ -73,21 +78,21 @@ sigm0 = 1
 ### One sample of $n = 500$
 
 ```{r echo=TRUE }
-set.seed(100) 
-eps      = rnorm(n, 0, sigm0)                       # generate disturbances N(0, sigma^2)
-ysim     = Xdgp %*% beta0 + eps                     # together with X, your data set is complete
+#set.seed(100) 
+#eps      = rnorm(n, 0, sigm0)                       # generate disturbances N(0, sigma^2)
+#ysim     = Xdgp %*% beta0 + eps                     # together with X, your data set is complete
 
 #
 #  Code for exercise 2.1
 #
 
-X = cbind( rep(1,n), , , ,  )          # setup the model you want to estimate
-k = ncol(X)
+#X = cbind( rep(1,n), , , ,  )          # setup the model you want to estimate
+#k = ncol(X)
 
-XtX   = t(X) %*% X                     # matrix with basic statistics (n, sum(x), sum(x^2))
-XXinv = solve(XtX)                     # matrix used in Variance of estimator b
-diagXXinv = diag(XXinv)                # the diagonal elements (for the variance of b)
-XXinvX    = XXinv %*% t(X)             # part of the estimator betahat that remains the same
+#XtX   = t(X) %*% X                     # matrix with basic statistics (n, sum(x), sum(x^2))
+#XXinv = solve(XtX)                     # matrix used in Variance of estimator b
+#diagXXinv = diag(XXinv)                # the diagonal elements (for the variance of b)
+#XXinvX    = XXinv %*% t(X)             # part of the estimator betahat that remains the same
 
 
 
@@ -116,7 +121,7 @@ XXinvX    = XXinv %*% t(X)             # part of the estimator betahat that rema
 
 
 
-for (i in 1:nsim) {
+# for (i in 1:nsim) {
 
 
 
@@ -127,11 +132,7 @@ for (i in 1:nsim) {
 #
 
 
-
-
-
-
-}
+# }
 ```
 
 
