@@ -42,7 +42,8 @@ The correlation coefficient can be measured as
 $$r_{\hat{\beta}_2,\hat{\beta}_3} = \frac{Cov(\hat{\beta}_2,\hat{\beta}_3)} {\sqrt{Var(\hat{\beta}_2)Var(\hat{\beta}_3)}}.$$
 Computing the expression in R yields the following result.
 ```{r echo=FALSE}
-e = y - (y - X %*% bhat)
+yhat = X %*% bhat
+e = y - yhat
 ssr = sum(e*e)
 sample_var = ssr/(n-K)
 var_cov = sample_var * solve(t(X) %*% X)
@@ -54,6 +55,78 @@ var_b3 = var_cov[3,3]
 corr_b2b3 = cov_b2b3 / sqrt(var_b2 * var_b3)
 round(corr_b2b3, 4)
 ```
+
+## Exercise 1.3
+## Part a)
+```{r echo = FALSE}
+Xa = cbind(X, yhat^2)
+Ka = ncol(Xa)
+
+bhat_a = solve(t(Xa) %*% Xa) %*% t(Xa) %*% y
+ea     = y - Xa %*% bhat_a
+gamma_hat = bhat_a[Ka]
+
+ssr_a      = sum(ea * ea)
+sigma2_reg = ssr_a / (n - Ka)
+se_reg     = sqrt((sigma2_reg * solve(t(Xa) %*% Xa))[Ka, Ka])
+t_stat_reg = gamma_hat / se_reg
+p_val_reg  = 2 * (1 - pt(abs(t_stat_reg), n - Ka))
+
+XXinv_a    = solve(t(Xa) %*% Xa)
+meat_a     = t(Xa) %*% (diag(as.vector(ea^2))) %*% Xa
+vcov_rob_a = XXinv_a %*% meat_a %*% XXinv_a * (n / (n - Ka))
+se_rob     = sqrt(vcov_rob_a[Ka, Ka])
+t_stat_rob = gamma_hat / se_rob
+p_val_rob  = 2 * (1 - pt(abs(t_stat_rob), n - Ka))
+
+df = n - Ka
+
+cat("t-test critical values at different significance levels:")
+cat("at 1%  | critical value:", round(qt(1-0.01/2, df), 4), "\n")
+cat("at 5%  | critical value:", round(qt(1-0.05/2, df), 4), "\n")
+cat("at 10% | critical value:", round(qt(1-0.10/2, df), 4), "\n")
+
+cat("Regular test:", "t-test value:", round(t_stat_reg, 4), " | p-value:", round(p_val_reg, 5), "\n")
+
+cat("Robust test:", "t-test value:", round(t_stat_rob, 4), " | p-value:", round(p_val_rob, 5), "\n")
+
+```
+
+## Part b)
+```{r echo = FALSE}
+Xb = cbind(X, yhat^2, yhat^3, yhat^4)
+Kb = ncol(Xb)
+q  = 3
+
+bhat_b = solve(t(Xb) %*% Xb) %*% t(Xb) %*% y
+eb     = y - Xb %*% bhat_b
+g_vec  = bhat_b[(Kb - q + 1):Kb] 
+
+ssr_b      = sum(eb * eb)
+sigma2_b   = ssr_b / (n - Kb)
+vcov_b_reg = sigma2_b * solve(t(Xb) %*% Xb)
+V_qq_reg   = vcov_b_reg[(Kb - q + 1):Kb, (Kb - q + 1):Kb]
+W_reg      = as.numeric(t(g_vec) %*% solve(V_qq_reg) %*% g_vec)
+p_val_reg  = 1 - pchisq(W_reg, df = q)
+
+XXinv_b    = solve(t(Xb) %*% Xb)
+meat_b     = t(Xb) %*% (diag(as.vector(eb^2))) %*% Xb
+vcov_b_rob = XXinv_b %*% meat_b %*% XXinv_b * (n / (n - Kb))
+V_qq_rob   = vcov_b_rob[(Kb - q + 1):Kb, (Kb - q + 1):Kb]
+W_rob      = as.numeric(t(g_vec) %*% solve(V_qq_rob) %*% g_vec)
+p_val_rob  = 1 - pchisq(W_rob, df = q)
+
+cat("Wald-test critical values at different significance levels (df=3):\n")
+cat("at 1%  | critical value:", round(qchisq(1-0.01, q), 4), "\n")
+cat("at 5%  | critical value:", round(qchisq(1-0.05, q), 4), "\n")
+cat("at 10% | critical value:", round(qchisq(1-0.10, q), 4), "\n\n")
+
+cat("Regular test: Wald value:", round(W_reg, 4), " | p-value:", round(p_val_reg, 5), "\n")
+cat("Robust test:  Wald value:", round(W_rob, 4), " | p-value:", round(p_val_rob, 5), "\n")
+
+```
+
+
 \newpage
 
 ## Part 2
