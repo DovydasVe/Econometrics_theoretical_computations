@@ -110,7 +110,7 @@ We see that using both the simple F-test and robust wald test, the P-value> 0.05
 ## Exercise 2.2: 10,000 simulations
 
 ```{r echo=TRUE}
-nsim = 100
+nsim = 10000
 
 F_cv_1  = qf(0.99, 3, n - 6)                      # critical values F(3, n-6)
 F_cv_5  = qf(0.95, 3, n - 6)
@@ -189,7 +189,7 @@ We vary $\beta_4$ to see how the rejection rate changes. Later, we test for non-
 
 ```{r echo=TRUE, fig.height=5, fig.width=7}
 b4_range=seq(0, 0.01, by = 0.002)
-nsim2= 100
+nsim2= 10000
 q= 3                                     # number of restrictions (yhat^2, yhat^3, yhat^4)
 
 rej_F= rep(0, length(b4_range))              # rejection counts for F
