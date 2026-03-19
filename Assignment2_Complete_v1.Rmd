@@ -66,6 +66,7 @@ round(corr_b2b3, 4)
 
 ## Exercise 1.3
 ## Part a)
+We test non-linearity using the regression specification error test "RESET" of Ramsey. The hypotheses are the following: $H_0:\gamma = 0$ vs $H_a: \gamma \ne 0$ for test equation which is $y_i = x'_i\beta + \gamma \hat{y}_i^2 + \epsilon_i$. The regular estimates rely on the classical OLS variance formula, $\sigma^2(X'X)^{-1}$. The robust estimates, however, use the Eicker-Huber-White 'sandwich' form, $(X'X)^{-1}(X'\Omega X)(X'X)^{-1}$, providing a heteroskedasticity-consistent covariance matrix. After computing the t-test, under $H_0$, for both standard error variations, we get the following results: 
 ```{r echo = FALSE}
 Xa = cbind(X, yhat^2)
 Ka = ncol(Xa)
@@ -99,8 +100,11 @@ cat("Regular test:", "t-test value:", round(t_stat_reg, 4), " | p-value:", round
 cat("Robust test:", "t-test value:", round(t_stat_rob, 4), " | p-value:", round(p_val_rob, 5), "\n")
 
 ```
+These results conclude that there is no significant evidence to reject the null hypothesis for both calculations - with regular standard errors and with robust standard errors - as t-test values are not in the rejection region and p-values are greater than 1%, 5% or 10% significances.
 
 ## Part b)
+
+We want to test for the hypothesis $H_0: \gamma_1 = \gamma_2 = \gamma_3 = 0$ vs $H_a:$ at least one $\gamma_j \ne 0,j=1,2,3$ for the test equation $y_i = x'_i\beta + \gamma_j\Sigma_{j=1}^3 \hat{y}_i^{1+j} + \epsilon_i$. After computing Wald test statistics (df = 3), using regular and robust to heteroscedasicity SE's, we get the following results for 1%, 5% and 10% significance levels:
 ```{r echo = FALSE}
 Xb = cbind(X, yhat^2, yhat^3, yhat^4)
 Kb = ncol(Xb)
@@ -133,8 +137,11 @@ cat("Regular test: Wald value:", round(W_reg, 4), " | p-value:", round(p_val_reg
 cat("Robust test:  Wald value:", round(W_rob, 4), " | p-value:", round(p_val_rob, 5), "\n")
 
 ```
+Again, we conclude that there is not enough evidence to reject the null hypothesis as p-values are above the significance levels and Wald-statistics for both - regular and robust - SE's are not in the rejection region.
 
 ## Exercise 1.4
+
+We want to test for heteroscedasticity, where we will use Breusch-Pagan test and use the regressors of the original model as z-variables. After following the three steps, the results we get are:
 ```{r echo=FALSE}
 e2 = e^2
 
@@ -160,7 +167,9 @@ cat("LM statistic: ", round(LM_stat, 4), " | p-value:", round(p_val_bp, 5), "\n"
 
 ```
 
+Since this p-value (0.00109 or 0.109%) is strictly less than the significance levels of 1%, 5%, and 10%, we reject the null hypothesis $H_0$ of homoskedasticity. By rejecting the null hypothesis, we can conclude that the variance of the error terms is not constant across the observations.
 
+While our current test, using the original regressors educ and exp, confirms the presence of heteroskedasticity, the conclusion is technically sensitive to the choice of z-variables. If the true heteroskedasticity is non-linear or driven by excluded factors, a test using only linear z-variables might lack the power to detect it. However, given our very low p-value, it is highly likely that heteroskedasticity is a robust feature of this dataset regardless of the specific z-variables chosen.
 \newpage
 
 # Part 2: Simulating the RESET test and Monte Carlo
