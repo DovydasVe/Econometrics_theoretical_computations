@@ -20,6 +20,10 @@ knitr::opts_chunk$set(comment = NA)    # no ## as start of output
 rm(list = ls());  cat("\014")          # start with a clean sheet
 ```
 
+
+\newpage
+
+
 # Part 1: Analyzing the Mincerian wage model
 
 ## Exercise 1.1
@@ -44,11 +48,13 @@ change in a regressor $x_{k,i}$ translates to $\beta_k \times 100\%$ change in $
 In other words, each additional unit of education increases wages by 11.8%,
 whereas each additional unit of experience increases wages only by 2.2%.
 
+\newpage
+
 ## Exercise 1.2
 
 The correlation coefficient can be measured as
 $$r_{\hat{\beta}_2,\hat{\beta}_3} = \frac{Cov(\hat{\beta}_2,\hat{\beta}_3)} {\sqrt{Var(\hat{\beta}_2)Var(\hat{\beta}_3)}}.$$
-Computing the expression in R yields the following result.
+Computing the expression in R yields the following result:
 ```{r echo=FALSE}
 yhat = X %*% bhat
 e = y - yhat
@@ -61,11 +67,18 @@ var_b2 = var_cov[2,2]
 var_b3 = var_cov[3,3]
 
 corr_b2b3 = cov_b2b3 / sqrt(var_b2 * var_b3)
-round(corr_b2b3, 4)
+
+cat(round(corr_b2b3, 4))
 ```
+Thus, there is small negative correlation between
+$Var(\hat{\beta}_2), Var(\hat{\beta}_3)$.
+
+
+\newpage
 
 ## Exercise 1.3
-## Part a)
+### Part a)
+
 We test non-linearity using the regression specification error test "RESET" of Ramsey. The hypotheses are the following: $H_0:\gamma = 0$ vs $H_a: \gamma \ne 0$ for test equation which is $y_i = x'_i\beta + \gamma \hat{y}_i^2 + \epsilon_i$. The regular estimates rely on the classical OLS variance formula, $\sigma^2(X'X)^{-1}$. The robust estimates, however, use the Eicker-Huber-White 'sandwich' form, $(X'X)^{-1}(X'\Omega X)(X'X)^{-1}$, providing a heteroskedasticity-consistent covariance matrix. After computing the t-test, under $H_0$, for both standard error variations, we get the following results: 
 ```{r echo = FALSE}
 Xa = cbind(X, yhat^2)
@@ -96,13 +109,11 @@ cat("at 5%  | critical value:", round(qt(1-0.05/2, df), 4), "\n")
 cat("at 10% | critical value:", round(qt(1-0.10/2, df), 4), "\n")
 
 cat("Regular test:", "t-test value:", round(t_stat_reg, 4), " | p-value:", round(p_val_reg, 5), "\n")
-
 cat("Robust test:", "t-test value:", round(t_stat_rob, 4), " | p-value:", round(p_val_rob, 5), "\n")
-
 ```
 These results conclude that there is no significant evidence to reject the null hypothesis for both calculations - with regular standard errors and with robust standard errors - as t-test values are not in the rejection region and p-values are greater than 1%, 5% or 10% significances.
 
-## Part b)
+### Part b)
 
 We want to test for the hypothesis $H_0: \gamma_1 = \gamma_2 = \gamma_3 = 0$ vs $H_a:$ at least one $\gamma_j \ne 0,j=1,2,3$ for the test equation $y_i = x'_i\beta + \gamma_j\Sigma_{j=1}^3 \hat{y}_i^{1+j} + \epsilon_i$. After computing Wald test statistics (df = 3), using regular and robust to heteroscedasicity SE's, we get the following results for 1%, 5% and 10% significance levels:
 ```{r echo = FALSE}
@@ -139,6 +150,9 @@ cat("Robust test:  Wald value:", round(W_rob, 4), " | p-value:", round(p_val_rob
 ```
 Again, we conclude that there is not enough evidence to reject the null hypothesis as p-values are above the significance levels and Wald-statistics for both - regular and robust - SE's are not in the rejection region.
 
+
+\newpage
+
 ## Exercise 1.4
 
 We want to test for heteroscedasticity, where we will use Breusch-Pagan test and use the regressors of the original model as z-variables. After following the three steps, the results we get are:
@@ -170,15 +184,14 @@ cat("LM statistic: ", round(LM_stat, 4), " | p-value:", round(p_val_bp, 5), "\n"
 Since this p-value (0.00109 or 0.109%) is strictly less than the significance levels of 1%, 5%, and 10%, we reject the null hypothesis $H_0$ of homoskedasticity. By rejecting the null hypothesis, we can conclude that the variance of the error terms is not constant across the observations.
 
 While our current test, using the original regressors educ and exp, confirms the presence of heteroskedasticity, the conclusion is technically sensitive to the choice of z-variables. If the true heteroskedasticity is non-linear or driven by excluded factors, a test using only linear z-variables might lack the power to detect it. However, given our very low p-value, it is highly likely that heteroskedasticity is a robust feature of this dataset regardless of the specific z-variables chosen.
+
 \newpage
 
 # Part 2: Simulating the RESET test and Monte Carlo
-
-
                                         
 ```{r echo=FALSE }
 file = "bankwage_data.csv"
-sprintf("We are using Dataset %s", file)
+cat("We are using Dataset %s", file)
 
 
 data  = read.csv("bankwage_data.csv")
@@ -192,7 +205,6 @@ n     = length(lwage)
 
 
 ```{r echo=FALSE}
-
 # Group 85 (odd) -> Dataset A -> n = 500
 # M = 85 %% 5 = 0 -> beta4 = 0.004, x4 = exp^2
 
@@ -213,7 +225,7 @@ We generate data from $y_i = 1 + 0.1\, educ_i + 0.025\, exp_i + 0.004\, exp_i^2 
 
 ## Exercise 2.1: One sample
 
-```{r echo=TRUE}
+```{r echo=FALSE}
 set.seed(42) 
 eps  = rnorm(n, 0, sigm0)                       # generate disturbances N(0, sigma^2)
 ysim = Xdgp %*% beta0 + eps                     # together with X, your dataset is complete
@@ -241,12 +253,54 @@ rownames(results) = c("constant  ", "educ", "exp")
 print(results, digits = 5)
 ```
 
+We analyze the scatter plot of rsiduals against fitted values, distribution of residuals and plot of education agains Y from the DGP. 
+
+```{r echo=FALSE, fig.height=3, fig.width=7}
+par(mfrow = c(1, 3))
+plot(yhat, e, pch = 20, cex = 0.4, col = "steelblue",
+     xlab = "Fitted values", ylab = "Residuals", main = "Residuals vs Fitted")
+abline(h = 0, col = 2, lty = 2)
+
+
+hist(as.numeric(e), breaks = 30, col = "steelblue", main = "Residual Distribution",
+     xlab = "Residuals")
+
+#We plot the experience variable against log income to see if there is a non linear pattern there. We fit a second degree polynomial on this scatter plot to see general trend of the variables
+plot(exp, ysim, pch = 20, cex = 0.4, col = "steelblue",  
+     xlab = "Experience", ylab = "log(Wage)", main = "Experience vs Log(Wage)")
+exp_seq  = seq(min(exp), max(exp), length.out = 200)
+fit_quad = lm(ysim ~ exp + I(exp^2))
+yhat_quad = predict(fit_quad, newdata = data.frame(exp = exp_seq))
+lines(exp_seq, yhat_quad, col = "red", lwd = 2)
+
+```
+In the figure on the left, we analyze the scatter plot of residuals for different fitted values. We observe approximate randomness of residuals around 0 and no particular patterns emerge, therefore we can not conclude non-linearity of true model.
+
+In the second figure, we see that residuals follow an approximate normal distribution. 
+
+In the third figure, we plot the experience variable against log(wage) to see if there is a non linear pattern there. We fit a second degree polynomial on this scatter plot to see the general trend. Since the fitted line has no visible curve, we can not conclude existence of non-linear experience terms in the model from visual analysis. 
  
 
 ### RESET test with $p = 3$
 
-```{r echo=TRUE}
+We test the model using RESET test with three additional terms with the model as follows:
+
+$y_i = x'_i\beta + \gamma_j\Sigma_{j=1}^3 \hat{y}_i^{1+j} + \epsilon_i$
+
+With $H_0: \gamma_1 = \gamma_2 = \gamma_3 = 0$ vs $H_a:$ at least one $\gamma_j \ne 0,j=1,2,3$ 
+
+```{r echo=FALSE}
+
+set.seed(0)
 # Unrestricted model: add yhat^2, yhat^3, yhat^4
+eps  = rnorm(n, 0, sigm0)                    # generate disturbances N(0, sigma^2)
+ysim = Xdgp %*% beta0 + eps                  # data from the TRUE model
+bhat   = XXinvX %*% ysim   
+yhat   = X %*% bhat             # OLS on misspecified model
+e      = ysim - yhat
+
+
+ssrR   = sum(e * e)
 Xu     = cbind(X, yhat^2, yhat^3, yhat^4)
 ku     = ncol(Xu)                                # 6 regressors in unrestricted model
 bhat_u = solve(t(Xu) %*% Xu, t(Xu) %*% ysim)
@@ -259,12 +313,11 @@ Fstat  = ((ssrR - ssrU) / q) / (ssrU / (n - ku))
 
 # Robust Wald
 XXinvU = solve(t(Xu) %*% Xu)
-XXinvU = solve(t(Xu) %*% Xu)
 ku = ncol(Xu)
 Sigma_hat = matrix(0, ku, ku)
 for (i in 1:nrow(Xu)) {
   xi = Xu[i, ]
-  Sigma_hat = Sigma_hat +  e[i]^2* xi %*% t(xi) 
+  Sigma_hat = Sigma_hat +  eu[i]^2* xi %*% t(xi) 
 }
 Var_rob   = XXinvU %*% Sigma_hat %*% XXinvU
 R      = cbind(matrix(0, q, 3), diag(q))    # We define a constraints such that last three regressors are zero. 
@@ -279,12 +332,15 @@ cat(sprintf("  Wald (robust)  = %.4f   p-value = %.4f\n",
             Wrob, pchisq(Wrob, df = 3, lower.tail = FALSE)))
 ```
 
-We see that using both the simple F-test and robust wald test, the P-value> 0.05, meaning that we reject the null hypothesis: 'The model has no ommitted variables'
+We see that using both the simple F-test and robust wald test, the P-value> 0.05, meaning that we can not reject the null hypothesis: 'The model has no omitted variables'. This is likely due to the small coefficient of the exp^2 term in the data generating process. 
+
 \newpage
 
 ## Exercise 2.2: 10,000 simulations
 
-```{r echo=TRUE}
+In this exercise, we run the same test as before but for 10000 simulations, reporting the rejection rates of the null hypothesis for different significance levels. 
+
+```{r echo=FALSE}
 nsim = 10000
 
 F_cv_1  = qf(0.99, 3, n - 6)                      # critical values F(3, n-6)
@@ -293,6 +349,7 @@ F_cv_10 = qf(0.90, 3, n - 6)
 W_cv_1  = qchisq(0.99, 3)                      # critical values Chisquare(3)
 W_cv_5  = qchisq(0.95, 3)
 W_cv_10 = qchisq(0.90, 3)
+q=3
 
 
 nrej1 = 0; nrej5 = 0; nrej10 = 0    #Normal rejects
@@ -306,6 +363,7 @@ for (i in 1:nsim) {
   yhat   = X %*% bhat             # OLS on misspecified model
   e      = ysim - yhat
   ssrR   = sum(e * e)
+  
   
   
   Xu     = cbind(X, yhat^2, yhat^3, yhat^4)    # RESET augmentation
@@ -323,12 +381,11 @@ for (i in 1:nsim) {
    
    #Robust test
   XXinvU = solve(t(Xu) %*% Xu)
-  XXinvU = solve(t(Xu) %*% Xu)
   ku = ncol(Xu)
   Sigma_hat = matrix(0, ku, ku)
-  for (i in 1:nrow(Xu)) {
-    xi = Xu[i, ]
-    Sigma_hat = Sigma_hat +  eu[i]^2* xi %*% t(xi) 
+  for (j in 1:nrow(Xu)) {
+    xi = Xu[j, ]
+    Sigma_hat = Sigma_hat +  eu[j]^2* xi %*% t(xi) 
   }
   Var_rob   = XXinvU %*% Sigma_hat %*% XXinvU
   R      = cbind(matrix(0, q, 3), diag(q))    # We define a constraints such that last three regressors are zero. 
@@ -342,27 +399,27 @@ for (i in 1:nsim) {
   
 }
 
-cat("Rejection rates over 10000 simulations:\n")
+cat("Rejection rates of simple test over 10000 simulations:\n")
 cat(sprintf("  1%%:  %.2f%%\n", nrej1  / nsim * 100))
 cat(sprintf("  5%%:  %.2f%%\n", nrej5  / nsim * 100))
 cat(sprintf("  10%%: %.2f%%\n", nrej10 / nsim * 100))
 
-cat("Rejection rates over 10000 simulations:\n")
+cat("Rejection rates of robust test over 10000 simulations:\n")
 cat(sprintf("  1%%:  %.2f%%\n", Rnrej1  / nsim * 100))
 cat(sprintf("  5%%:  %.2f%%\n",Rnrej5  / nsim * 100))
 cat(sprintf("  10%%: %.2f%%\n", Rnrej10 / nsim * 100))
 ```
 
-The null hypothesis is rejected very often, with at least 54.33% times with the robust test with significance level 0.01. At Significance 0.1, the hypothesis is rejected 85.95% of times with robust test and 87.58% with normal F-test. 
+The null hypothesis is rejected more often than not, with at least 64.71% times with the robust test with significance level 0.01. At Significance 0.1, the hypothesis is rejected 88.84% of times with robust test and 87.58% with normal F-test. 
 
 \newpage
 
 ## Exercise 2.3: Power curve
 
-We vary $\beta_4$ to see how the rejection rate changes. Later, we test for non-linearity using the RESET F-test and the robust Wald test and plot the rejection probability as a function of $\beta_4$.
+We vary $\beta_4$ to see how the rejection rate changes. Later, we test for non-linearity using the RESET F-test and the robust Wald test and plot the rejection probability as a function of $\beta_4$. We analyze the rejection rates for $\beta_4$ in range (0,0.01). 
 
 
-```{r echo=TRUE, fig.height=5, fig.width=7}
+```{r echo=FALSE, fig.height=5, fig.width=7}
 b4_range=seq(0, 0.01, by = 0.002)
 nsim2= 10000
 q= 3                                     # number of restrictions (yhat^2, yhat^3, yhat^4)
@@ -428,7 +485,7 @@ legend("topleft", legend = c("F-test", "Robust Wald"),
        col = c("blueviolet", "orchid3"), pch = c(20, 17), lty = 1)
 ```
 
-```{r echo=TRUE}
+```{r echo=FALSE}
 cat("Power curve values (5% level):\n\n")
 cat(sprintf("  %-10s  %10s  %12s\n", "beta4", "F-test", "Robust Wald"))
 for (j in 1:length(b4_range)) {
@@ -445,7 +502,7 @@ At $\beta_4 = 0$ the simulated rejection probability should be near 5%. As $\bet
 
 We introduce heteroscedastic errors: $\varepsilon_i \sim N(0,\; \exp(\alpha \cdot educ_i))$ with $\alpha = 0.1$.
 
-```{r echo=TRUE}
+```{r echo=FALSE}
 alpha_het = 0.1
 nsim3     = 10000
 
